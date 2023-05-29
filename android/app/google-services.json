@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "112514955660",
+    "firebase_url": "https://flutterpos-faf67-default-rtdb.firebaseio.com",
+    "project_id": "flutterpos-faf67",
+    "storage_bucket": "flutterpos-faf67.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:112514955660:android:2f45734c02076358eafea9",
+        "android_client_info": {
+          "package_name": "br.com.marcelo.myTasks.my_tasks"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAsSYdx-d4Bapc2QfoztCDxX1mVCxk1VFE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
