@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_tasks/routes/routes.path.dart';
-
-import '../ models/task.dart';
+import 'package:task_pk_ex_pos_flutter/task_pk.dart';
 import '../screens/task_form_screen.dart';
 import '../services/tasks_service.dart';
 
@@ -14,7 +13,7 @@ class ItemListTask extends StatelessWidget {
 
   final Task task;
   final Function(bool) onTaskStatusChanged;
-  
+
   @override
   Widget build(BuildContext context) {
     return ListTile(

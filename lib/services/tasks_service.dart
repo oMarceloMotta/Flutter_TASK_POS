@@ -1,7 +1,6 @@
 import 'dart:convert';
 
-import 'package:http/http.dart';
-import 'package:my_tasks/%20models/task.dart';
+import 'package:task_pk_ex_pos_flutter/task_pk.dart';
 import 'package:my_tasks/repositories/tasks_repository.dart';
 
 class TasksService {
@@ -9,38 +8,31 @@ class TasksService {
 
   Future<List<Task>> list() async {
     try {
-      Response response = await _tasksRepository.list();
-      Map<String, dynamic>? json = jsonDecode(response.body);
-      return Task.listFromJson(json);
+      return await _tasksRepository.list();
     } catch (err) {
       throw Exception(err.toString());
     }
   }
 
-  Future<Map<String, dynamic>> insert(Task task) async {
+  Future<void> insert(Task task) async {
     try {
-      String json = jsonEncode(task.toJson());
-      Response response = await _tasksRepository.insert(json);
-      return jsonDecode(response.body) as Map<String, dynamic>;
+      await _tasksRepository.insert(task);
     } catch (err) {
       throw Exception("Problemas ao inserir produto.");
     }
   }
 
-  Future<Map<String, dynamic>> update(String id, Task task) async {
+  Future<void> update(String id, Task task) async {
     try {
-      String json = jsonEncode(task.toJson());
-      Response response = await _tasksRepository.update(id, json);
-      return jsonDecode(response.body) as Map<String, dynamic>;
+      await _tasksRepository.update(id, task);
     } catch (err) {
       throw Exception("Problemas ao inserir produto.");
     }
   }
 
-  Future<bool> delete(String id) async {
+  Future<void> delete(String id) async {
     try {
-      Response response = await _tasksRepository.delete(id);
-      return response.statusCode == 200;
+      await _tasksRepository.delete(id);
     } catch (err) {
       throw Exception("Problemas ao excluir produto.");
     }

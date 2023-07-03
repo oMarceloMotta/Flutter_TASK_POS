@@ -1,9 +1,13 @@
+def keyProperties = new Properties()
+def keyStorePropertiesFile = rootProject.file('key.properties');
+if (keyStorePropertiesFile.exists()) {
+    keyProperties.load(new FileInputStream(keyStorePropertiesFile))
+}
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
-    }
+    localProperties.load(new InputStreamReader(new FileInputStream(localPropertiesFile), 'UTF-8'))
 }
 
 def flutterRoot = localProperties.getProperty('flutter.sdk')
@@ -22,6 +26,9 @@ if (flutterVersionName == null) {
 }
 
 apply plugin: 'com.android.application'
+// START: FlutterFire Configuration
+apply plugin: 'com.google.gms.google-services'
+// END: FlutterFire Configuration
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
@@ -42,19 +49,27 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        // TODO: Especifique seu próprio ID de aplicativo único (https://developer.android.com/studio/build/application-id.html).
         applicationId "br.com.marcelo.myTasks.my_tasks"
-        minSdkVersion flutter.minSdkVersion
+        minSdkVersion 19
+        multiDexEnabled true
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
-
+    signingConfigs{
+        release{
+            keyAlias keyProperties['keyAlias']
+            keyPassword keyProperties['keyPassword']
+            storePassword keyProperties['storePassword']
+            storeFile keyProperties['storeFile'] ? file(keyProperties['storeFile']) : null
+        }
+    }
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
+            // TODO: Adicione sua própria configuração de assinatura para a versão de lançamento.
+            // Assinando com as chaves de depuração por enquanto, para que `flutter run --release` funcione.
+            signingConfig signingConfigs.release
         }
     }
 }

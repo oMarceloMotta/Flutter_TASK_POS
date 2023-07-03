@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 
-import '../ models/task.dart';
+import 'package:task_pk_ex_pos_flutter/task_pk.dart';
 import '../screens/home.screen.dart';
 import '../services/tasks_service.dart';
+import 'package:intl/intl.dart';
 
 class FormTask extends StatefulWidget {
   final String? paramId;
   final String? paramName;
   final String? paramLocation;
+  final DateTime? dateTask;
   final bool? paramStatus;
 
   const FormTask({
@@ -16,6 +18,7 @@ class FormTask extends StatefulWidget {
     this.paramId,
     this.paramName,
     this.paramLocation,
+    this.dateTask,
     this.paramStatus,
   }) : super(key: key);
 
@@ -30,6 +33,8 @@ class _FormTaskState extends State<FormTask> {
   final TasksService _service = TasksService();
   late Future<String> _locationFuture;
   late String id = '';
+  late ValueNotifier<DateTime?> _dateTaskNotifier;
+
   @override
   void initState() {
     super.initState();
@@ -40,6 +45,22 @@ class _FormTaskState extends State<FormTask> {
     _locationFuture = widget.paramLocation != null
         ? Future.value(widget.paramLocation!)
         : getLocation();
+    _dateTaskNotifier = ValueNotifier<DateTime?>(widget.dateTask);
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2023),
+      lastDate: DateTime(2024),
+    );
+
+    if (picked != null && picked != _dateTaskNotifier.value) {
+      setState(() {
+        _dateTaskNotifier.value = picked;
+      });
+    }
   }
 
   Future<String> getLocation() async {
@@ -65,16 +86,20 @@ class _FormTaskState extends State<FormTask> {
   }
 
   void onSubmit() {
-    Task task = Task(_name.text, _statusNotifier.value, _location.text);
+    Task task = Task(
+      name: _name.text,
+      status: _statusNotifier.value,
+      location: _location.text,
+      datetime: _dateTaskNotifier.value,
+    );
     if (id != '') {
       _service.update(id, task);
     } else {
       _service.insert(task);
     }
-    Navigator.pop(context); // Voltar à tela anterior
+    Navigator.pop(context);
 
     Navigator.pushReplacement(
-      // Substituir a tela atual
       context,
       MaterialPageRoute(
         builder: (context) => const Home(),
@@ -83,12 +108,10 @@ class _FormTaskState extends State<FormTask> {
   }
 
   void onDelete() {
-    Task task = Task(_name.text, _statusNotifier.value, _location.text);
     _service.delete(id);
-    Navigator.pop(context); // Voltar à tela anterior
+    Navigator.pop(context); // Volver a la pantalla anterior
 
     Navigator.pushReplacement(
-      // Substituir a tela atual
       context,
       MaterialPageRoute(
         builder: (context) => const Home(),
@@ -96,13 +119,18 @@ class _FormTaskState extends State<FormTask> {
     );
   }
 
-  Widget ButtonDelete() {
+  Widget buttonDelete() {
     if (id != '') {
       return ElevatedButton(
         onPressed: onDelete,
-        child: Text("Deletar"),
+        child: const Text("Deletar"),
         style: ElevatedButton.styleFrom(
-          primary: Colors.red, // Cambia el color del botón a rojo
+          backgroundColor: const Color.fromARGB(
+            255,
+            99,
+            104,
+            205,
+          ),
         ),
       );
     }
@@ -125,9 +153,12 @@ class _FormTaskState extends State<FormTask> {
               future: _locationFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
+                  return const Padding(
+                    padding: EdgeInsets.all(50.0),
+                    child: CircularProgressIndicator(),
+                  );
                 } else if (snapshot.hasError) {
-                  return Text('Erro ao obter localização');
+                  return const Text('Erro ao obter localização');
                 } else {
                   _location.text = snapshot.data ?? '';
                   return TextField(
@@ -138,6 +169,28 @@ class _FormTaskState extends State<FormTask> {
                   );
                 }
               },
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ValueListenableBuilder<DateTime?>(
+                    valueListenable: _dateTaskNotifier,
+                    builder: (context, value, child) {
+                      return Text(value != null
+                          ? DateFormat('dd/MM/yyyy').format(value)
+                          : '');
+                    },
+                  ),
+                  ElevatedButton(
+                    onPressed: () => _selectDate(context),
+                    child: Text(_dateTaskNotifier.value == null
+                        ? 'Selecionar uma data'
+                        : 'Alterar Data'),
+                  ),
+                ],
+              ),
             ),
             Row(
               children: [
@@ -160,9 +213,9 @@ class _FormTaskState extends State<FormTask> {
                 children: [
                   ElevatedButton(
                     onPressed: onSubmit,
-                    child: Text("Salvar"),
+                    child: const Text("Salvar"),
                   ),
-                  ButtonDelete(),
+                  buttonDelete(),
                 ],
               ),
             ),
