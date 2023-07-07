@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
+import 'package:my_tasks/providers/task_firestore_provider.dart';
 
 import 'package:task_pk_ex_pos_flutter/task_pk.dart';
 import '../screens/home.screen.dart';
-import '../services/tasks_service.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class FormTask extends StatefulWidget {
   final String? paramId;
@@ -30,7 +31,6 @@ class _FormTaskState extends State<FormTask> {
   final _name = TextEditingController();
   final _location = TextEditingController();
   final ValueNotifier<bool> _statusNotifier = ValueNotifier<bool>(false);
-  final TasksService _service = TasksService();
   late Future<String> _locationFuture;
   late String id = '';
   late ValueNotifier<DateTime?> _dateTaskNotifier;
@@ -86,16 +86,20 @@ class _FormTaskState extends State<FormTask> {
   }
 
   void onSubmit() {
+    final taskProvider =
+        Provider.of<TaskFireStoreProvider>(context, listen: false);
+
     Task task = Task(
+      id: id,
       name: _name.text,
       status: _statusNotifier.value,
       location: _location.text,
       datetime: _dateTaskNotifier.value,
     );
     if (id != '') {
-      _service.update(id, task);
+      taskProvider.update(task);
     } else {
-      _service.insert(task);
+      taskProvider.insert(task);
     }
     Navigator.pop(context);
 
@@ -108,7 +112,16 @@ class _FormTaskState extends State<FormTask> {
   }
 
   void onDelete() {
-    _service.delete(id);
+    final taskProvider =
+        Provider.of<TaskFireStoreProvider>(context, listen: false);
+    Task task = Task(
+      id: id,
+      name: _name.text,
+      status: _statusNotifier.value,
+      location: _location.text,
+      datetime: _dateTaskNotifier.value,
+    );
+    taskProvider.remove(task);
     Navigator.pop(context); // Volver a la pantalla anterior
 
     Navigator.pushReplacement(

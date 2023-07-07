@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:my_tasks/routes/routes.path.dart';
 import 'package:task_pk_ex_pos_flutter/task_pk.dart';
+import '../providers/task_firestore_provider.dart';
 import '../screens/task_form_screen.dart';
-import '../services/tasks_service.dart';
+import 'package:provider/provider.dart';
 
 class ItemListTask extends StatelessWidget {
   const ItemListTask({
@@ -26,7 +27,9 @@ class ItemListTask extends StatelessWidget {
             value: task.status,
             onChanged: (value) {
               onTaskStatusChanged(value ?? false);
-              TasksService().update(task.id.toString(), task);
+              final taskProvider =
+                  Provider.of<TaskFireStoreProvider>(context, listen: false);
+              taskProvider.update(task);
             },
           ),
           IconButton(

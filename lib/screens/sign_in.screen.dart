@@ -17,7 +17,7 @@ class _SignInScreenState extends State<SignInScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final FirebaseAuth auth = FirebaseAuth.instance;
-  late String message;
+  late final String message;
   String request = 'https://pensador-api.vercel.app/?term=Jesus+Cristo&max=7';
 
   Future<Map<String, dynamic>> getData() async {
